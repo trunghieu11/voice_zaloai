@@ -50,7 +50,8 @@ def processtest(fname):
     return data, name
 
 def train():
-    files = list(absoluteFilePaths('../data/voice_zaloai/train/'))
+    files = list(absoluteFilePaths('../data/train/'))
+    print("file size: ", len(files))
     p = Pool(40)    
     data = p.map(processtrain, files)
     X = [data[i][0] for i in range(len(data))]
@@ -62,10 +63,10 @@ def train():
     region = [region_dict[data[i][2]] for i in range(len(data))]
     region = to_categorical(region)
     
-    np.savez('../data/voice_zaloai/train', X=X, gender=gender, region=region)
+    np.savez('../data/train', X=X, gender=gender, region=region)
 
 def test():
-    files = list(absoluteFilePaths('../data/voice_zaloai/public_test/'))
+    files = list(absoluteFilePaths('../data/public_test/'))
     p = Pool(40) 
     data = p.map(processtest, files)
     
@@ -73,8 +74,8 @@ def test():
     X = np.asarray(X)
     
     name = [data[i][1] for i in range(len(data))]
-    np.savez('../data/voice_zaloai/publictest', X=X, name=name)
+    np.savez('../data/publictest', X=X, name=name)
 
 if __name__=='__main__':
-    train()
+    # train()
     test() 

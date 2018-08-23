@@ -21,11 +21,11 @@ def get_model(timeseries, nfeatures, nclass):
 
     return model
 
-data = np.load('../data/voice_zaloai/train.npz')
+data = np.load('../data/train.npz')
 X, gender, region = data['X'], data['gender'], data['region']
 X_train, X_test, gender_train, gender_test, region_train, region_test = train_test_split(X, gender, region, test_size=0.2, random_state=2018)
 
-publictest = np.load('../data/voice_zaloai/publictest.npz')
+publictest = np.load('../data/publictest.npz')
 X_publictest, fname = publictest['X'], publictest['name']
 
 print('train test: ', X_train.shape, X_test.shape)
@@ -37,7 +37,7 @@ model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy
 model.summary()
 
 batch_size = 1024
-nb_epochs = 10000
+nb_epochs = 1000
 
 model.fit(X_train, region_train, batch_size=batch_size, epochs=nb_epochs, validation_data=(X_test, region_test), verbose=2)
 
