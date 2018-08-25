@@ -9,6 +9,7 @@ from keras.models import Sequential
 from keras.layers.recurrent import LSTM
 from keras.layers import Dense
 from keras.optimizers import Adam,Adadelta,Nadam,Adamax,RMSprop
+from keras.callbacks import CSVLogger
 from sklearn.model_selection import train_test_split
 
 
@@ -27,19 +28,20 @@ X_train, X_test, gender_train, gender_test, region_train, region_test = train_te
 
 publictest = np.load('../data/publictest.npz')
 X_publictest, fname = publictest['X'], publictest['name']
+csv_logger = CSVLogger('log.csv', append=True, separator=';')
 
 print('train test: ', X_train.shape, X_test.shape)
 print('public test: ', X_publictest.shape)
 
 opt = RMSprop()
-model = get_model(X.shape[1], X.shape[2], 3)
+model = get_model(X.shape[1], X.shape[2], 2)
 model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 model.summary()
 
 batch_size = 1024
 nb_epochs = 1000
 
-model.fit(X_train, region_train, batch_size=batch_size, epochs=nb_epochs, validation_data=(X_test, region_test), verbose=2)
+model.fit(X_train, gender_train, batch_size=batch_size, epochs=nb_epochs, validation_data=(X_test, gender_test), verbose=2, callbacks=[csv_logger])
 
 predicts = model.predict(X_publictest, batch_size=batch_size)
 predicts = np.argmax(predicts, axis=1)
@@ -49,5 +51,5 @@ gender_dict = {0:'female', 1:'male'}
 for i in range(32):
     print(fname[i], '-->', region_dict[predicts[i]])
 
-submit = pd.DataFrame.from_dict({'id':fname, 'accent':predicts}) 
-submit.to_csv('submit.csv', index=False)
+submit = pd.DataFrame.from_dict({'id':fname, 'gender':predicts})
+submit.to_csv('submit_gender.csv', index=False)
