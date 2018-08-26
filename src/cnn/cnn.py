@@ -18,7 +18,7 @@ from keras import backend as K
 # ====================== Initial all class and constant ======================
 
 # Change this to True to replicate the result
-COMPLETE_RUN = True
+COMPLETE_RUN = False
 
 # All file's paths
 TRAIN_FILE_PATH = "../labels/train_gender.csv"
@@ -289,8 +289,8 @@ for i, (train_split, val_split) in enumerate(skf):
     np.save(PREDICTION_FOLDER + "/test_predictions_%d.npy"%i, predictions)
 
     # Make a submission file
-    top_3 = np.array(LABELS)[np.argsort(-predictions, axis=1)[:, :3]]
-    predicted_labels = [' '.join(list(x)) for x in top_3]
+    top_2 = np.array(LABELS)[np.argsort(-predictions, axis=1)[:, :2]]
+    predicted_labels = [' '.join(list(x)) for x in top_2]
     test['label'] = predicted_labels
     test[['label']].to_csv(PREDICTION_FOLDER + "/predictions_%d.csv"%i)
 
@@ -302,15 +302,15 @@ for pred in pred_list:
     prediction = prediction*pred
 prediction = prediction**(1./len(pred_list))
 # Make a submission file
-top_3 = np.array(LABELS)[np.argsort(-prediction, axis=1)[:, :3]]
-predicted_labels = [' '.join(list(x)) for x in top_3]
+top_1 = np.array(LABELS)[np.argsort(-prediction, axis=1)[:, :1]]
+predicted_labels = [x[0] for x in top_1]
 test = pd.read_csv(TEST_FILE_PATH)
 
 if not COMPLETE_RUN:
     test = test[:100]
 
-test['label'] = predicted_labels
-test[['fname', 'label']].to_csv("1d_conv_ensembled_submission.csv", index=False)
+test['gender'] = predicted_labels
+test[['fname', 'gender']].to_csv("1d_conv_ensembled_gender_submission.csv", index=False)
 
 # ====================== Building a Model using MFCC ======================
 
@@ -423,8 +423,8 @@ for pred in pred_list:
     prediction = prediction*pred
 prediction = prediction**(1./len(pred_list))
 # Make a submission file
-top_3 = np.array(LABELS)[np.argsort(-prediction, axis=1)[:, :3]]
-predicted_labels = [' '.join(list(x)) for x in top_3]
+top_1 = np.array(LABELS)[np.argsort(-prediction, axis=1)[:, :1]]
+predicted_labels = [' '.join(list(x)) for x in top_1]
 test = pd.read_csv(TEST_FILE_PATH)
-test['label'] = predicted_labels
-test[['fname', 'label']].to_csv("1d_2d_ensembled_submission.csv", index=False)
+test['gender'] = predicted_labels
+test[['fname', 'gender']].to_csv("1d_2d_ensembled_gender_submission.csv", index=False)
