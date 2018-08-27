@@ -38,10 +38,10 @@ model = get_model(X.shape[1], X.shape[2], 2)
 model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 model.summary()
 
-batch_size = 1024
+batch_size = 256
 nb_epochs = 1000
 
-model.fit(X_train, gender_train, batch_size=batch_size, epochs=nb_epochs, validation_data=(X_test, gender_test), verbose=2, callbacks=[csv_logger])
+model.fit(X_train, region_train, batch_size=batch_size, epochs=nb_epochs, validation_data=(X_test, region_test), verbose=2, callbacks=[csv_logger])
 
 predicts = model.predict(X_publictest, batch_size=batch_size)
 predicts = np.argmax(predicts, axis=1)
