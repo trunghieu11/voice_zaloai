@@ -1,13 +1,16 @@
 from os import listdir
 from os.path import isfile, join
 
-train_file = open("/home/trunghieu11/Work/voice_zaloai/src/labels/test.csv", "a+")
+train_file = open("../labels/train_accent.csv", "a+")
 
-my_path = ["/home/trunghieu11/Work/voice_zaloai/data/public_test"]
+list_accent = ["north", "central", "south"]
 
-for path in my_path:
-    for f in listdir(path):
-        if isfile(join(path, f)):
-            train_file.write(f + "\n")
+for i, accent in enumerate(list_accent):
+    my_path = ["../../data/train/female_" + accent, "../../data/train/male_" + accent]
+
+    for path in my_path:
+        for f in listdir(path):
+            if isfile(join(path, f)):
+                train_file.write(f + "," + str(i) + "\n")
 
 train_file.close()
