@@ -152,7 +152,8 @@ def get_random_eraser(p=0.5, s_l=0.02, s_h=0.4, r_1=0.3, r_2=1/0.3, v_l=0, v_h=2
 # =========================================================================================
 
 confLH, confX = {}, {}
-confs = [confLH, confX]
+# confs = [confLH, confX]
+confs = [confLH]
 confLH['folder'] = 'LH_accent'
 confX['folder'] = 'X_accent'
 
@@ -668,23 +669,23 @@ def pred_geometric_mean_by_files(npy_pred_files):
 
 # =========================================================================================
 
-for conf in [confX]: # Running confX only, change this to confs if you need running both confX and confLH
-    print('== Attempt [%s] ==' % conf['folder'])
-#     train_pred_files = list(conf['folder'].glob('train_pred*.npy'))
-    train_pred_files = [conf['folder'] + "/" + 'train_predictions_0.npy']
-    print('Train set ensemble = ', train_pred_files)
-    ensembled_train_preds = pred_geometric_mean_by_files(train_pred_files)
-    y_train = keras.utils.to_categorical(loaddata(conf, 'y_train.npy'))
-    acc, acc_v = evaluate_pred_acc(y_train, ensembled_train_preds, all_idx_train, len(plain_y_train))
-    print('Ensemble train set accuracy =', acc)
-    print('Ensemble verified samples accuracy =', acc_v)
-    np.save(datapath(conf, 'ensemble_train_preds.npy'), ensembled_train_preds)
-
-#     test_pred_files = list(conf['folder'].glob('test_pred*.npy'))
-    test_pred_files = [conf['folder'] + "/" + 'test_predictions_0.npy']
-    print('Test set ensemble = ', test_pred_files)
-    ensembled_test_preds = pred_geometric_mean_by_files(test_pred_files)
-    np.save(datapath(conf, 'ensemble_test_preds.npy'), ensembled_test_preds)
+# for conf in [confX]: # Running confX only, change this to confs if you need running both confX and confLH
+#     print('== Attempt [%s] ==' % conf['folder'])
+# #     train_pred_files = list(conf['folder'].glob('train_pred*.npy'))
+#     train_pred_files = [conf['folder'] + "/" + 'train_predictions_0.npy']
+#     print('Train set ensemble = ', train_pred_files)
+#     ensembled_train_preds = pred_geometric_mean_by_files(train_pred_files)
+#     y_train = keras.utils.to_categorical(loaddata(conf, 'y_train.npy'))
+#     acc, acc_v = evaluate_pred_acc(y_train, ensembled_train_preds, all_idx_train, len(plain_y_train))
+#     print('Ensemble train set accuracy =', acc)
+#     print('Ensemble verified samples accuracy =', acc_v)
+#     np.save(datapath(conf, 'ensemble_train_preds.npy'), ensembled_train_preds)
+#
+# #     test_pred_files = list(conf['folder'].glob('test_pred*.npy'))
+#     test_pred_files = [conf['folder'] + "/" + 'test_predictions_0.npy']
+#     print('Test set ensemble = ', test_pred_files)
+#     ensembled_test_preds = pred_geometric_mean_by_files(test_pred_files)
+#     np.save(datapath(conf, 'ensemble_test_preds.npy'), ensembled_test_preds)
 
 # =========================================================================================
 # =========================================================================================

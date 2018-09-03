@@ -152,7 +152,8 @@ def get_random_eraser(p=0.5, s_l=0.02, s_h=0.4, r_1=0.3, r_2=1/0.3, v_l=0, v_h=2
 # =========================================================================================
 
 confLH, confX = {}, {}
-confs = [confLH, confX]
+# confs = [confLH, confX]
+confs = [confLH]
 confLH['folder'] = 'LH_accent'
 confX['folder'] = 'X_accent'
 
@@ -320,7 +321,7 @@ for conf in confs:
 
 def create_model(conf, num_classes):
     input_shape = conf['dims']
-    if False:
+    if True:
         # This is the model used for competition
         # Thanks to: https://github.com/titu1994/keras-squeeze-excite-network
         from se_resnet import SEResNet
@@ -589,24 +590,24 @@ def run_fold(conf, fold, dataset, model=None, init_best_weights=False, eval_only
 
 # =========================================================================================
 
-confLH['n_fold'] = 2 if TRYING_AS_TOY else 5
+confLH['n_fold'] = 2 if TRYING_AS_TOY else 2
 confLH['normalize'] = 'samplewise'
 confLH['valid_limit'] = 'manually_verified_only'
 confLH['random_state'] = 42
 confLH['test_size'] = 0.2
 confLH['batch_size'] = 32
 confLH['learning_rate'] = 0.0001
-confLH['epochs'] = 10 if TRYING_AS_TOY else 200
+confLH['epochs'] = 10 if TRYING_AS_TOY else 100
 confLH['verbose'] = 1
 
-confX['n_fold'] = 2 if TRYING_AS_TOY else 5
+confX['n_fold'] = 2 if TRYING_AS_TOY else 2
 confX['normalize'] = 'featurewise'
 confX['valid_limit'] = None
 confX['random_state'] = 42
 confX['test_size'] = 0.2
 confX['batch_size'] = 32
 confX['learning_rate'] = 0.0001
-confX['epochs'] = 10 if TRYING_AS_TOY else 200
+confX['epochs'] = 10 if TRYING_AS_TOY else 100
 confX['verbose'] = 1
 
 # =========================================================================================
@@ -635,6 +636,8 @@ for conf in confs:
         all_X_train[whitelist], all_y_train[whitelist], all_idx_train[whitelist]
     print('Filtered samples on blacklist, now trainset has %d samples' % len(idx_train))
 
+
+
     # Train folds
     work = {'train_acc': [],
             'train_acc_verified': [],
@@ -643,8 +646,9 @@ for conf in confs:
         acc, acc_verified, history, model, _ = run_fold(conf, fold,
                 [X_train, y_train, idx_train, all_X_train, all_y_train, all_idx_train, X_test, idx_test],
                 model=None,
+                init_best_weights=conf['folder'] + "/best_%d.h5" % fold if os.path.exists(conf['folder'] + "/best_%d.h5" % fold) else False,
 #                 init_best_weights=EXTRA + '/X48_AlexNet_00696.h5',
-                init_best_weights=False,
+#                 init_best_weights=False,
                 eval_only=False)
         work['history'].append(history)
         work['train_acc'].append(acc)
@@ -668,23 +672,23 @@ def pred_geometric_mean_by_files(npy_pred_files):
 
 # =========================================================================================
 
-for conf in [confX]: # Running confX only, change this to confs if you need running both confX and confLH
-    print('== Attempt [%s] ==' % conf['folder'])
-#     train_pred_files = list(conf['folder'].glob('train_pred*.npy'))
-    train_pred_files = [conf['folder'] + "/" + 'train_predictions_0.npy']
-    print('Train set ensemble = ', train_pred_files)
-    ensembled_train_preds = pred_geometric_mean_by_files(train_pred_files)
-    y_train = keras.utils.to_categorical(loaddata(conf, 'y_train.npy'))
-    acc, acc_v = evaluate_pred_acc(y_train, ensembled_train_preds, all_idx_train, len(plain_y_train))
-    print('Ensemble train set accuracy =', acc)
-    print('Ensemble verified samples accuracy =', acc_v)
-    np.save(datapath(conf, 'ensemble_train_preds.npy'), ensembled_train_preds)
-
-#     test_pred_files = list(conf['folder'].glob('test_pred*.npy'))
-    test_pred_files = [conf['folder'] + "/" + 'test_predictions_0.npy']
-    print('Test set ensemble = ', test_pred_files)
-    ensembled_test_preds = pred_geometric_mean_by_files(test_pred_files)
-    np.save(datapath(conf, 'ensemble_test_preds.npy'), ensembled_test_preds)
+# for conf in [confX]: # Running confX only, change this to confs if you need running both confX and confLH
+#     print('== Attempt [%s] ==' % conf['folder'])
+# #     train_pred_files = list(conf['folder'].glob('train_pred*.npy'))
+#     train_pred_files = [conf['folder'] + "/" + 'train_predictions_0.npy']
+#     print('Train set ensemble = ', train_pred_files)
+#     ensembled_train_preds = pred_geometric_mean_by_files(train_pred_files)
+#     y_train = keras.utils.to_categorical(loaddata(conf, 'y_train.npy'))
+#     acc, acc_v = evaluate_pred_acc(y_train, ensembled_train_preds, all_idx_train, len(plain_y_train))
+#     print('Ensemble train set accuracy =', acc)
+#     print('Ensemble verified samples accuracy =', acc_v)
+#     np.save(datapath(conf, 'ensemble_train_preds.npy'), ensembled_train_preds)
+#
+# #     test_pred_files = list(conf['folder'].glob('test_pred*.npy'))
+#     test_pred_files = [conf['folder'] + "/" + 'test_predictions_0.npy']
+#     print('Test set ensemble = ', test_pred_files)
+#     ensembled_test_preds = pred_geometric_mean_by_files(test_pred_files)
+#     np.save(datapath(conf, 'ensemble_test_preds.npy'), ensembled_test_preds)
 
 # =========================================================================================
 # =========================================================================================
